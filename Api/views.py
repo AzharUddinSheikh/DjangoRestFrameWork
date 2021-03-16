@@ -34,6 +34,8 @@ def apioverview(request):
     return Response(api_urls)
 
 # Django’s serialization framework provides a mechanism for “translating” Django models into other formats.
+
+
 @api_view(['GET'])
 def taskList(request):
     tasks = Task.objects.all()
@@ -41,8 +43,22 @@ def taskList(request):
     return Response(serializer.data)
 
 # Getting Specific Object in a Task Model
+
+
 @api_view(['GET'])
-def taskDetail(request,pk):
+def taskDetail(request, pk):
     tasks = Task.objects.get(id=pk)
     serializer = TaskSerializer(tasks, many=False)
+    return Response(serializer.data)
+
+
+# The core functionality of the Request object is the request.data attribute,
+# which is similar to request.POST, but more useful for working with Web APIs.
+@api_view(['POST'])
+def taskCreate(request):
+    serializer = TaskSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+
     return Response(serializer.data)
