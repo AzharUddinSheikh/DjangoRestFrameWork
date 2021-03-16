@@ -47,7 +47,11 @@ def taskList(request):
 
 @api_view(['GET'])
 def taskDetail(request, pk):
-    tasks = Task.objects.get(id=pk)
+    try:
+        tasks = Task.objects.get(id=pk)
+    except Task.DoesNotExist:
+        return Response("status 404 Not found Please provide the valid id")
+
     serializer = TaskSerializer(tasks, many=False)
     return Response(serializer.data)
 
@@ -64,21 +68,25 @@ def taskCreate(request):
     return Response(serializer.data)
 
 
+# Response error generate only when submit button hit
 @api_view(['POST'])
 def taskUpdate(request, pk):
-    task = Task.objects.get(id=pk)
-    serializer = TaskSerializer(instance=task, data=request.data)
+    try:
+        task = Task.objects.get(id=pk)
+    except Task.DoesNotExist:
+        return Response("The Id provided by the user doesnot exist please Enter the valid id")
 
+    serializer = TaskSerializer(instance=task, data=request.data)
     if serializer.is_valid():
         serializer.save()
-
     return Response(serializer.data)
 
 
 @api_view(['DELETE'])
 def taskDelete(request, pk):
-    task = Task.objects.get(id=pk)
-
+    try:
+        task = Task.objects.get(id=pk)
+    except Task.DoesNotExist:
+        return Response("Deleting the given id is not valid")
     task.delete()
-
     return Response("Item Has been Deleted")
